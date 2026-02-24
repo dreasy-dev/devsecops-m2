@@ -208,4 +208,33 @@ Principes :
 | Capacités réduites       | --cap-drop=ALL puis ajouter uniquement ce qui est requis                                       |
 
 
+## Partie 3
+1) Sécuriser une pipeline CI/CD signifie mettre en place des contrôles pour empêcher l’exécution de code malveillant, protéger les secrets, valider l’intégrité des artefacts, contrôler qui a accès à quoi, et garantir que seuls des exécutables sûrs et autorisés sont produits et déployés. Les risques majeurs incluent la compromission des clés/secrets, l’injection de code dans les builds, la fuite d’informations sensibles et la contamination de l’environnement de production.
 
+2) Le pipeline CI/CD fait partie de la surface d’attaque car il a accès au code source, aux secrets, aux serveurs de production et peut déployer automatiquement des applications. Si compromis, un attaquant peut injecter du code malveillant ou accéder à des ressources critiques via le pipeline.
+
+3) Un runner partagé exécute des jobs pour plusieurs projets/utilisateurs, tandis qu’un runner dédié ne sert qu’à un projet ou à une équipe donnée. C’est important pour la sécurité car un runner partagé peut être utilisé comme vecteur pour attaquer d’autres projets, alors qu’un runner dédié limite la propagation et l’exposition.
+
+4) Si un runner peut exécuter du code venant d’une MR/PR non validée, un attaquant pourrait exécuter du code malveillant sur l’infrastructure de CI, exfiltrer des secrets, altérer les artefacts ou compromettre la chaîne de production.
+
+5) Pour isoler les jobs et éviter l’exécution de code malveillant entre pipelines, on utilise des environnements jetables (sandbox, conteneurs éphémères, VM), on configure des droits/privilèges minimums et on sépare clairement les secrets et ressources entre jobs.
+
+6) Pour garantir qu’une image Docker est fiable, utiliser des images officielles et versionnées, vérifier leur signature (image signing), scanner les images contre les CVE connues, et ne prendre une image que depuis des sources approuvées ou d’un registre audité.
+
+7) Utiliser "latest" comme tag Docker est risqué car rien ne garantit que la version utilisée reste la même dans le temps : on perd reproductibilité, on peut subir des régressions ou des vulnérabilités non anticipées.
+
+8) Un SBOM ("Software Bill Of Materials") liste toutes les dépendances incluses dans une application/image. L’intégrer dans le pipeline permet de garder la traçabilité, de vérifier les licences et de simplifier les audits de sécurité (et les réponses aux alertes vulnérabilités).
+
+9) SAST (Static Application Security Testing) analyse le code source pour trouver des failles de sécurité, tandis que SCA (Software Composition Analysis) analyse les dépendances (librairies tierces) et leurs vulnérabilités connues. Les deux sont nécessaires : le SAST couvre le code de l’équipe, le SCA ce qui vient de l’extérieur.
+
+10) Un SAST doit être exécuté dès le début du pipeline (lors du push ou de la MR/PR), pour corriger tôt. Un SCA doit être exécuté à chaque modification de dépendance, idéalement à chaque build aussi, pour détecter les nouvelles vulnérabilités publiées.
+
+11) Quand un scan SCA détecte une vulnérabilité dans une dépendance critique, il faut évaluer sa gravité, chercher un correctif/patch, mettre à jour la dépendance si possible, et appliquer un plan d’atténuation (désactiver la fonctionnalité, restreindre les accès) si la correction est impossible immédiatement.
+
+12) Pour sécuriser un container registry en entreprise : forcer l’authentification, limiter l’accès (RBAC), activer la vérification des signatures, scanner les images uploadées (anti-malware et CVE), supprimer les images obsolètes, et auditer les logs d’accès.
+
+13) Il faut scanner les images Docker avant le build (pour vérifier la base) et après le build (pour l’image complète) afin de garantir qu’aucune vulnérabilité majeure ou artefact risqué n’a été introduit pendant la phase d’assemblage.
+
+14) On peut intégrer la sécurité dans le pipeline sans trop ralentir les équipes en automatisant les scans (SAST/SCA rapides), en configurant des seuils de blocage pertinents, et en produisant des alertes actionnables plutôt que des blocages systématiques.
+
+15) Pour détecter et bloquer les dépendances non approuvées : définir une liste de dépendances autorisées et désapprouvées, utiliser les outils SCA avec une politique stricte, et automatiser le blocage du build en cas de détection d’une dépendance non approuvée.
