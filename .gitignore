@@ -1,0 +1,7 @@
+#met tout les cache et .xxx dans le dossier tp 1
+/tp 1/__pycache__/
+/tp 1/.coverage
+/tp 1/.pytest_cache/
+/tp 1/.ruff_cache/
+/tp 1/.venv/
+/tp 1/app/__pycache__/
