@@ -13,6 +13,12 @@ def test_root():
     assert response.json()["message"] == "Hello"
 
 
+def test_health():
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
+
+
 def test_list_notes_empty():
     response = client.get("/notes")
     assert response.status_code == 200

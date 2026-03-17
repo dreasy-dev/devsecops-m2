@@ -35,6 +35,11 @@ def root():
     return {"message": "Hello", "status": "ok"}
 
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
 @app.get("/notes")
 def list_notes():
     with db_cursor() as cur:
