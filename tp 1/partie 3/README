@@ -1,39 +1,5 @@
 # Partie 3 — Pipeline CI/CD GitHub
 
-## Mini-projet api-notes (SQLite + Docker)
-
-### Structure
-
-```
-partie 3/
-├── app/ (main.py, database.py, requirements.txt)
-├── tests/
-├── Dockerfile
-└── (CI: .github/workflows/partie3-ci.yml à la racine)
-```
-
-### Lancer en local
-
-```bash
-cd "tp 1/partie 3"
-pip install -r app/requirements.txt pytest httpx
-uvicorn app.main:app --reload
-pytest tests/ -v
-```
-
-### Docker
-
-```bash
-docker build -t api-notes .
-docker run -p 8000:8000 api-notes
-```
-
-### Pipeline GitHub Actions
-
-- **build** : Docker | **test** : pytest | **sca** : pip-audit | **sast** : bandit | **trivy** : scan Dockerfile
-- Déclenchement : push/PR sur `tp 1/partie 3/`
-
----
 
 ## Réponses aux questions
 
