@@ -1,0 +1,79 @@
+name: Partie 3 CI
+
+on:
+  push:
+    paths:
+      - 'tp 1/partie 3/**'
+  pull_request:
+    paths:
+      - 'tp 1/partie 3/**'
+
+defaults:
+  run:
+    working-directory: tp 1/partie 3
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t api-notes .
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r app/requirements.txt pytest httpx
+
+      - name: Run tests
+        run: pytest tests/ -v
+
+  sca:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: pip-audit
+        run: |
+          pip install pip-audit
+          pip-audit -r app/requirements.txt
+
+  sast:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: bandit
+        run: |
+          pip install bandit
+          bandit -r app/ -ll
+
+  trivy:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Trivy scan Dockerfile
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
